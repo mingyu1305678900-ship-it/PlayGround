@@ -1,0 +1,150 @@
+<!doctype html>
+<html lang="ko">
+  <head>
+    <meta charset="UTF-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover" />
+    <meta name="theme-color" content="#0a0a0c" />
+    <title>LOS SANTOS — Street Heat</title>
+    <link rel="icon" href="data:image/svg+xml,<svg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'><text y='.9em' font-size='90'>🌴</text></svg>" />
+  </head>
+  <body>
+    <div id="app">
+      <div id="hud" class="hidden">
+        <div class="hud-top-right">
+          <div id="wanted" class="wanted hidden"></div>
+          <div id="money" class="money">$0</div>
+          <div id="radio-popup" class="radio-popup hidden">
+            <span class="radio-icon">♪</span>
+            <span id="radio-name">LOS SANTOS ROCK RADIO</span>
+          </div>
+        </div>
+
+        <div class="hud-left">
+          <div id="area-name" class="area-name">VINEWOOD HILLS</div>
+          <div id="radar-wrap" class="radar-wrap">
+            <canvas id="radar" width="420" height="420"></canvas>
+            <div class="radar-ring"></div>
+            <div class="radar-n">N</div>
+            <div id="player-blip" class="player-blip"></div>
+          </div>
+          <div class="stat-bars">
+            <div class="stat health"><div id="health-fill" class="fill"></div></div>
+            <div class="stat armor"><div id="armor-fill" class="fill"></div></div>
+          </div>
+        </div>
+
+        <div id="objective" class="objective hidden">
+          <div class="objective-icon">◆</div>
+          <div id="objective-text">—</div>
+        </div>
+
+        <div id="interact-prompt" class="interact-prompt hidden"><kbd>F</kbd><span id="interact-text">차량 훔치기</span></div>
+
+        <div id="subtitle" class="subtitle hidden"></div>
+
+        <div id="notifications" class="notifications"></div>
+
+        <div class="hud-bottom-right">
+          <div id="speedo" class="speedo hidden">
+            <div class="speedo-bar"><div id="speedo-fill"></div></div>
+            <div class="speedo-row">
+              <span id="speedo-num">0</span><span class="speedo-unit">KM/H</span>
+            </div>
+            <div id="gear" class="gear">D</div>
+          </div>
+          <div id="weapon-hud" class="weapon-hud">
+            <div id="weapon-icon" class="weapon-icon">🔫</div>
+            <div class="weapon-meta">
+              <div id="weapon-name" class="weapon-name">PISTOL</div>
+              <div class="ammo"><span id="ammo-mag">12</span><span class="ammo-sep">/</span><span id="ammo-reserve">120</span></div>
+            </div>
+          </div>
+        </div>
+
+        <div id="crosshair" class="crosshair"><i></i><i></i><i></i><i></i><b></b></div>
+        <div id="hitmarker" class="hitmarker"></div>
+        <div id="damage-vignette" class="damage-vignette"></div>
+        <div id="area-banner" class="area-banner"></div>
+        <div id="big-message" class="big-message hidden">
+          <div id="big-title">MISSION PASSED</div>
+          <div id="big-sub">+$2,500</div>
+        </div>
+
+        <div id="mobile-controls" class="mobile-controls hidden">
+          <div id="stick-zone" class="stick-zone"><div class="stick-base"><div id="stick-knob" class="stick-knob"></div></div></div>
+          <div id="look-zone" class="look-zone"></div>
+          <div class="touch-buttons">
+            <button id="btn-fire" class="tbtn fire">FIRE</button>
+            <button id="btn-aim" class="tbtn small">AIM</button>
+            <button id="btn-jump" class="tbtn small">JUMP</button>
+            <button id="btn-enter" class="tbtn small">CAR</button>
+            <button id="btn-sprint" class="tbtn small">RUN</button>
+            <button id="btn-brake" class="tbtn small">BRAKE</button>
+            <button id="btn-reload" class="tbtn tiny">R</button>
+          </div>
+        </div>
+      </div>
+
+      <div id="intro" class="intro">
+        <div class="intro-bg"></div>
+        <div class="intro-content">
+          <div class="brand">
+            <div class="brand-top">LOS SANTOS</div>
+            <div class="brand-main">STREET<span>HEAT</span></div>
+            <div class="brand-sub">A GTA-INSPIRED OPEN WORLD PLAYGROUND</div>
+          </div>
+          <p class="intro-copy">
+            해가 지는 로스 산토스. 차를 훔치고, 총을 쏘고, 경찰을 따돌리세요.<br />
+            도시는 당신의 무대입니다.
+          </p>
+          <div class="controls-grid">
+            <div><kbd>W A S D</kbd><span>이동</span></div>
+            <div><kbd>MOUSE</kbd><span>시점 / 조준</span></div>
+            <div><kbd>F</kbd><span>차량 탑승 · 훔치기</span></div>
+            <div><kbd>LMB</kbd><span>사격</span></div>
+            <div><kbd>SHIFT</kbd><span>달리기</span></div>
+            <div><kbd>SPACE</kbd><span>점프 / 핸드브레이크</span></div>
+            <div><kbd>R</kbd><span>장전</span></div>
+            <div><kbd>1 2 3</kbd><span>무기 변경</span></div>
+            <div><kbd>H</kbd><span>경적</span></div>
+            <div><kbd>B</kbd><span>라디오</span></div>
+          </div>
+          <div class="loading-wrap">
+            <div class="loading-label"><span id="load-status">INITIALIZING</span><span id="load-pct">0%</span></div>
+            <div class="loading-bar"><div id="load-fill"></div></div>
+          </div>
+          <button id="start-btn" class="start-btn" disabled>ENTER LOS SANTOS</button>
+          <div class="intro-foot">
+            <span class="tag">18+</span>
+            <span>비공식 팬메이드 패러디 · Rockstar Games와 무관합니다.</span>
+          </div>
+        </div>
+        <div class="intro-side">
+          <div class="side-line"></div>
+          <div class="side-text">VINEWOOD / DOWNTOWN / DEL PERRO / SANDY SHORES</div>
+          <div class="side-line"></div>
+        </div>
+      </div>
+
+      <div id="pause" class="pause hidden">
+        <div class="pause-panel">
+          <h1>PAUSED</h1>
+          <p>ESC 또는 아래 버튼으로 계속</p>
+          <button id="resume-btn" class="start-btn">계속하기</button>
+          <button id="restart-btn" class="ghost-btn">처음부터</button>
+          <div class="pause-tip">TIP: 차량에 다가가 <kbd>F</kbd> 를 누르면 훔칠 수 있습니다. 경찰이 보는 앞에서 총을 쏘면 수배가 올라갑니다.</div>
+        </div>
+      </div>
+
+      <div id="wasted" class="wasted hidden">
+        <div class="wasted-inner">
+          <div class="wasted-title">WASTED</div>
+          <div class="wasted-sub">당신은 쓰러졌습니다 · 병원으로 이송됩니다</div>
+        </div>
+      </div>
+
+      <div id="touch-hint" class="touch-hint hidden">왼쪽 스틱으로 이동 · 오른쪽 화면 드래그로 시점</div>
+    </div>
+    <script type="module" src="/src/main.js"></script>
+  </body>
+</html>
