@@ -1,0 +1,397 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#f7e7e6" />
+  <meta name="description" content="꽃집 '여름의 문'에서 시작되는 7일간의 로맨스. 당신의 선택이 이야기를 바꿉니다." />
+  <title>여름의 끝에서, 너에게</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Crect width='64' height='64' rx='16' fill='%23fbe9e7'/%3E%3Cpath d='M32 50S12 38 12 24a10 10 0 0 1 20-5 10 10 0 0 1 20 5c0 14-20 26-20 26z' fill='%23cf6d7c'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="css/style.css" />
+</head>
+<body data-screen="title">
+
+  <!-- ambient scene -->
+  <div class="scene" aria-hidden="true">
+    <div class="sun"></div>
+    <div class="bokeh bokeh-1"></div>
+    <div class="bokeh bokeh-2"></div>
+    <div class="bokeh bokeh-3"></div>
+    <div class="grain"></div>
+    <div class="petals" id="petals"></div>
+  </div>
+
+  <header class="hud" id="hud">
+    <div class="hud-day">
+      <span class="hud-eyebrow" id="dayLabel">DAY 1</span>
+      <span class="hud-chapter" id="chapterLabel">첫 만남</span>
+    </div>
+    <div class="hud-right">
+      <div class="affection" title="서아의 호감도">
+        <span class="affection-heart" aria-hidden="true">♥</span>
+        <div class="meter" role="progressbar" aria-label="호감도" aria-valuemin="0" aria-valuemax="100" aria-valuenow="15" id="meter">
+          <i id="affectionFill"></i>
+        </div>
+        <span class="affection-value" id="affectionValue">15</span>
+      </div>
+      <button class="icon-btn" id="soundBtn" type="button" aria-label="소리 켜기" aria-pressed="false" title="소리">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M11 5 6.5 9H3v6h3.5L11 19V5Z"/><path class="wave" d="M15 8.5a5 5 0 0 1 0 7"/><path class="wave" d="M17.5 6a8.5 8.5 0 0 1 0 12"/><path class="slash" d="M15 5l6 14"/></svg>
+      </button>
+      <button class="icon-btn" id="menuBtn" type="button" aria-label="메뉴 열기" title="메뉴">
+        <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 7h16M4 12h16M4 17h16"/></svg>
+      </button>
+    </div>
+  </header>
+
+  <main class="stage" id="stage">
+
+    <!-- character -->
+    <section class="portrait-card" id="portraitCard" aria-label="윤서아">
+      <div class="portrait-arch" aria-hidden="true"></div>
+      <div class="portrait-sun" aria-hidden="true"></div>
+      <div class="portrait-frame" aria-hidden="true"></div>
+
+      <svg class="portrait mood-neutral" id="portrait" viewBox="0 0 600 740" role="img" aria-label="꽃집 주인 윤서아의 초상">
+        <defs>
+          <radialGradient id="skinGrad" cx="45%" cy="32%" r="75%">
+            <stop offset="0%" stop-color="#ffede2"/>
+            <stop offset="55%" stop-color="#ffdfce"/>
+            <stop offset="100%" stop-color="#f4c3b1"/>
+          </radialGradient>
+          <linearGradient id="hairGrad" x1="0" y1="0" x2="1" y2="1">
+            <stop offset="0%" stop-color="#5a3840"/>
+            <stop offset="45%" stop-color="#3b2530"/>
+            <stop offset="100%" stop-color="#25171f"/>
+          </linearGradient>
+          <linearGradient id="hairLight" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#8d5a60"/>
+            <stop offset="100%" stop-color="#6b414b"/>
+          </linearGradient>
+          <linearGradient id="blouseGrad" x1="0" y1="0" x2="0.4" y2="1">
+            <stop offset="0%" stop-color="#fffaf4"/>
+            <stop offset="100%" stop-color="#f0ddd4"/>
+          </linearGradient>
+          <linearGradient id="cardiganGrad" x1="0" y1="0" x2="0.6" y2="1">
+            <stop offset="0%" stop-color="#efc3bf"/>
+            <stop offset="100%" stop-color="#d69a9d"/>
+          </linearGradient>
+          <radialGradient id="irisGrad" cx="42%" cy="35%" r="70%">
+            <stop offset="0%" stop-color="#d59a5f"/>
+            <stop offset="55%" stop-color="#a1633a"/>
+            <stop offset="100%" stop-color="#5d3220"/>
+          </radialGradient>
+          <linearGradient id="lipGrad" x1="0" y1="0" x2="0" y2="1">
+            <stop offset="0%" stop-color="#d97c85"/>
+            <stop offset="100%" stop-color="#b25561"/>
+          </linearGradient>
+          <filter id="softGlow" x="-50%" y="-50%" width="200%" height="200%">
+            <feGaussianBlur stdDeviation="14"/>
+          </filter>
+        </defs>
+
+        <!-- back hair -->
+        <g class="hair-back">
+          <path d="M300 94C198 94 140 168 136 276c-3 70 10 132-6 214-12 64-36 108-48 146-10 30 14 54 44 42 44-18 70-82 80-152 10-66 4-128 8-182h172c4 54-2 116 8 182 10 70 36 134 80 152 30 12 54-12 44-42-12-38-36-82-48-146-16-82-3-144-6-214-4-108-62-182-164-182Z" fill="url(#hairGrad)"/>
+          <path d="M168 300c-10 90 6 170-18 260-8 30-22 62-32 88 26-10 44-40 54-72 22-70 18-160 14-222Z" fill="#6b414b" opacity=".3"/>
+          <path d="M432 300c10 90-6 170 18 260 8 30 22 62 32 88-26-10-44-40-54-72-22-70-18-160-14-222Z" fill="#6b414b" opacity=".3"/>
+        </g>
+
+        <!-- neck & shoulders -->
+        <g class="body">
+          <path d="M262 366h76l10 74c-24 18-72 18-96 0Z" fill="#f2c3b2"/>
+          <path d="M262 374c12 20 26 30 38 30s26-10 38-30l4 22c-14 24-70 24-84 0Z" fill="#dba28f" opacity=".55"/>
+          <path d="M300 430c-56 0-108 20-140 56-46 51-68 138-76 254h432c-8-116-30-203-76-254-32-36-84-56-140-56Z" fill="url(#blouseGrad)"/>
+          <!-- cardigan -->
+          <path d="M190 470c-44 38-72 128-82 270h124c-10-98-4-198 22-262-22-2-44-4-64-8Z" fill="url(#cardiganGrad)"/>
+          <path d="M410 470c44 38 72 128 82 270H368c10-98 4-198-22-262 22-2 44-4 64-8Z" fill="url(#cardiganGrad)"/>
+          <g stroke="#b87b7f" stroke-width="2" opacity=".38" fill="none">
+            <path d="M154 500c-14 70-20 160-20 240M172 506c-12 66-16 152-16 234M436 500c14 70 20 160 20 240M418 506c12 66 16 152 16 234"/>
+          </g>
+          <path d="M252 468c16 26 80 26 96 0l16 34c-32 28-96 28-128 0Z" fill="#fff6ee"/>
+          <path d="M262 500c14 12 62 12 76 0l4 10c-20 16-64 16-84 0Z" fill="#e9cfc4"/>
+          <!-- necklace -->
+          <path d="M272 460c10 18 46 18 56 0" fill="none" stroke="#d8a95c" stroke-width="2.4" stroke-linecap="round"/>
+          <path d="M300 486c-5-5-12 0-9 6 2 4 9 8 9 8s7-4 9-8c3-6-4-11-9-6Z" fill="#d8a95c"/>
+        </g>
+
+        <!-- ears -->
+        <path d="M198 282c-14-4-26 8-24 26 2 20 14 34 28 32Z" fill="#f7cdbb"/>
+        <path d="M402 282c14-4 26 8 24 26-2 20-14 34-28 32Z" fill="#f7cdbb"/>
+        <path d="M190 312c2 10 8 18 14 20M410 312c-2 10-8 18-14 20" stroke="#dba28f" stroke-width="2" fill="none" opacity=".7"/>
+
+        <!-- face -->
+        <path d="M300 146c74 0 106 54 106 126 0 52-20 102-54 130-16 14-34 24-52 24s-36-10-52-24c-34-28-54-78-54-130 0-72 32-126 106-126Z" fill="url(#skinGrad)"/>
+        <path d="M232 300c-8 28 4 58 20 76 10 12 24 22 38 26-28-4-60-30-70-70-4-14-2-26 2-38Z" fill="#eeb5a1" opacity=".35"/>
+        <path d="M368 300c8 28-4 58-20 76-10 12-24 22-38 26 28-4 60-30 70-70 4-14 2-26-2-38Z" fill="#eeb5a1" opacity=".25"/>
+
+        <!-- brows -->
+        <g class="brows" fill="none" stroke="#553039" stroke-width="5" stroke-linecap="round">
+          <path class="brow brow-l" d="M226 270c14-7 32-4 44 4"/>
+          <path class="brow brow-r" d="M374 270c-14-7-32-4-44 4"/>
+        </g>
+
+        <!-- eyes: neutral / happy -->
+        <g class="eye-set eyes-neutral">
+          <g class="eye eye-l">
+            <path d="M228 302c8-15 24-24 40-24 12 0 20 8 22 22-10 12-26 18-40 16-10-1-18-6-22-14Z" fill="#fff8f6"/>
+            <circle cx="258" cy="302" r="16" fill="url(#irisGrad)"/>
+            <circle cx="258" cy="304" r="7" fill="#2a1714"/>
+            <circle cx="258" cy="304" r="10.5" fill="none" stroke="#4a2517" stroke-width="1.2" opacity=".5"/>
+            <circle cx="252" cy="295" r="5.4" fill="#fff" opacity=".95"/>
+            <circle cx="264" cy="309" r="2.4" fill="#fff" opacity=".8"/>
+            <path d="M226 299c9-18 27-27 44-26" fill="none" stroke="#33202a" stroke-width="7" stroke-linecap="round"/>
+            <path d="M288 292c3 4 5 8 5 12" fill="none" stroke="#33202a" stroke-width="4" stroke-linecap="round"/>
+          </g>
+          <g class="eye eye-r">
+            <path d="M372 302c-8-15-24-24-40-24-12 0-20 8-22 22 10 12 26 18 40 16 10-1 18-6 22-14Z" fill="#fff8f6"/>
+            <circle cx="342" cy="302" r="16" fill="url(#irisGrad)"/>
+            <circle cx="342" cy="304" r="7" fill="#2a1714"/>
+            <circle cx="342" cy="304" r="10.5" fill="none" stroke="#4a2517" stroke-width="1.2" opacity=".5"/>
+            <circle cx="336" cy="295" r="5.4" fill="#fff" opacity=".95"/>
+            <circle cx="348" cy="309" r="2.4" fill="#fff" opacity=".8"/>
+            <path d="M374 299c-9-18-27-27-44-26" fill="none" stroke="#33202a" stroke-width="7" stroke-linecap="round"/>
+            <path d="M312 292c-3 4-5 8-5 12" fill="none" stroke="#33202a" stroke-width="4" stroke-linecap="round"/>
+          </g>
+        </g>
+
+        <!-- eyes: closed, smiling -->
+        <g class="eye-set eyes-happy" fill="none" stroke="#33202a" stroke-width="6" stroke-linecap="round">
+          <path d="M228 306c10-16 26-22 40-18"/>
+          <path d="M372 306c-10-16-26-22-40-18"/>
+          <path d="M226 306l-8 2M374 306l8 2"/>
+        </g>
+
+        <!-- eyes: wide open (surprise) -->
+        <g class="eye-set eyes-wide">
+          <g class="eye eye-l">
+            <path d="M226 302c8-19 26-30 44-29 12 1 20 10 22 26-10 15-28 23-44 21-11-2-19-8-22-18Z" fill="#fff8f6"/>
+            <circle cx="258" cy="302" r="17" fill="url(#irisGrad)"/>
+            <circle cx="258" cy="304" r="7" fill="#2a1714"/>
+            <circle cx="251" cy="294" r="5.6" fill="#fff"/>
+            <circle cx="265" cy="310" r="2.4" fill="#fff" opacity=".8"/>
+            <path d="M224 298c9-20 29-30 47-28" fill="none" stroke="#33202a" stroke-width="6.5" stroke-linecap="round"/>
+          </g>
+          <g class="eye eye-r">
+            <path d="M374 302c-8-19-26-30-44-29-12 1-20 10-22 26 10 15 28 23 44 21 11-2 19-8 22-18Z" fill="#fff8f6"/>
+            <circle cx="342" cy="302" r="17" fill="url(#irisGrad)"/>
+            <circle cx="342" cy="304" r="7" fill="#2a1714"/>
+            <circle cx="335" cy="294" r="5.6" fill="#fff"/>
+            <circle cx="349" cy="310" r="2.4" fill="#fff" opacity=".8"/>
+            <path d="M376 298c-9-20-29-30-47-28" fill="none" stroke="#33202a" stroke-width="6.5" stroke-linecap="round"/>
+          </g>
+        </g>
+
+        <!-- blush -->
+        <g class="blush" fill="#ff8f9a">
+          <ellipse cx="232" cy="342" rx="25" ry="12" opacity=".26"/>
+          <ellipse cx="368" cy="342" rx="25" ry="12" opacity=".26"/>
+          <g stroke="#ef7d89" stroke-width="2.2" stroke-linecap="round" opacity=".5">
+            <path d="M218 338l-6-4M226 345l-7 1M238 338l6-4"/>
+            <path d="M382 338l6-4M374 345l7 1M362 338l-6-4"/>
+          </g>
+        </g>
+
+        <!-- nose -->
+        <path d="M298 326c4 4 6 7 4 9" fill="none" stroke="#d99c8c" stroke-width="2.6" stroke-linecap="round"/>
+
+        <!-- mouths -->
+        <g class="mouth-set mouth-neutral">
+          <path d="M284 358c10 8 22 8 32 0" fill="none" stroke="#b4575f" stroke-width="3.6" stroke-linecap="round"/>
+          <path d="M292 360c6 3 12 3 17 0" fill="none" stroke="#e39aa0" stroke-width="2" stroke-linecap="round" opacity=".7"/>
+        </g>
+        <g class="mouth-set mouth-smile">
+          <path d="M280 354c6 12 14 18 20 18s14-6 20-18c-12 6-28 6-40 0Z" fill="url(#lipGrad)"/>
+          <path d="M292 366c4 3 12 3 16 0" fill="none" stroke="#f4b7ba" stroke-width="2" stroke-linecap="round" opacity=".8"/>
+        </g>
+        <g class="mouth-set mouth-laugh">
+          <path d="M276 350c6 18 16 26 24 26s18-8 24-26c-14 8-34 8-48 0Z" fill="#a94c59"/>
+          <path d="M292 364c5 5 11 5 16 0 3 6-2 12-8 12s-11-6-8-12Z" fill="#e28790"/>
+          <path d="M276 350c14 8 34 8 48 0" fill="none" stroke="#8e3d49" stroke-width="2" stroke-linecap="round"/>
+        </g>
+        <g class="mouth-set mouth-sad">
+          <path d="M285 364c9-6 21-6 30 0" fill="none" stroke="#b4575f" stroke-width="3.4" stroke-linecap="round"/>
+        </g>
+        <g class="mouth-set mouth-surprise">
+          <ellipse cx="300" cy="362" rx="9" ry="12" fill="#a94c59"/>
+          <ellipse cx="300" cy="366" rx="5" ry="6" fill="#d97982" opacity=".8"/>
+        </g>
+
+        <!-- front hair -->
+        <g class="hair-front">
+          <path d="M300 126C218 126 190 192 192 268c9-28 18-46 36-58 6 28 14 42 26 44-2-28 4-44 14-54 8 24 16 44 24 48 6-24 14-40 24-52 10 24 18 46 24 54 10-18 20-30 28-36 14 16 22 32 28 54 6-76-24-142-96-142Z" fill="url(#hairGrad)"/>
+          <path d="M206 230c-6 62-4 118-14 172-8 42-22 78-18 110 4 20 24 22 32 2 10-30 10-76 22-118 10-36 10-84 6-130Z" fill="url(#hairGrad)"/>
+          <path d="M394 230c6 62 4 118 14 172 8 42 22 78 18 110-4 20-24 22-32 2-10-30-10-76-22-118-10-36-10-84-6-130Z" fill="url(#hairGrad)"/>
+          <g fill="none" stroke="url(#hairLight)" stroke-linecap="round" opacity=".55">
+            <path d="M232 166c-16 18-22 40-24 66" stroke-width="4"/>
+            <path d="M330 154c18 10 30 30 34 58" stroke-width="4"/>
+            <path d="M216 288c-4 34-6 66-14 98" stroke-width="3"/>
+            <path d="M388 288c4 34 6 66 14 98" stroke-width="3"/>
+          </g>
+          <!-- ahoge -->
+          <path d="M302 128c4-26 30-38 44-26-16-2-28 10-30 28Z" fill="url(#hairGrad)"/>
+          <!-- flower clip -->
+          <g transform="translate(360 222) rotate(14)">
+            <g fill="#f3b7bd">
+              <circle cx="0" cy="-9" r="8"/><circle cx="9" cy="0" r="8"/><circle cx="0" cy="9" r="8"/><circle cx="-9" cy="0" r="8"/>
+            </g>
+            <circle cx="0" cy="0" r="5" fill="#e0a94e"/>
+            <circle cx="0" cy="0" r="2" fill="#fff3d0"/>
+          </g>
+          <!-- earrings -->
+          <circle cx="194" cy="344" r="4.6" fill="#e0a94e"/>
+          <circle cx="406" cy="344" r="4.6" fill="#e0a94e"/>
+        </g>
+
+        <!-- sparkles -->
+        <g class="sparkles" fill="#fff" opacity=".8">
+          <path d="M126 208l3 8 8 3-8 3-3 8-3-8-8-3 8-3Z"/>
+          <path d="M470 262l2.4 6 6 2.4-6 2.4-2.4 6-2.4-6-6-2.4 6-2.4Z"/>
+          <path d="M448 168l2 5 5 2-5 2-2 5-2-5-5-2 5-2Z"/>
+        </g>
+      </svg>
+
+      <div class="portrait-name">
+        <span class="portrait-name-main">윤서아</span>
+        <span class="portrait-name-sub">YOON SEO-A · 24</span>
+      </div>
+      <div class="mood-chip" id="moodChip">🍃 차분함</div>
+    </section>
+
+    <!-- dialogue -->
+    <section class="panel" id="panel" aria-label="이야기">
+      <div class="panel-top">
+        <div class="place">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 21s7-6.1 7-11a7 7 0 1 0-14 0c0 4.9 7 11 7 11Z"/><circle cx="12" cy="10" r="2.6"/></svg>
+          <span id="placeLabel">골목 끝 꽃집, 여름의 문</span>
+        </div>
+        <div class="progress" id="progress" aria-hidden="true"></div>
+      </div>
+      <p class="chapter-quote" id="chapterQuote"></p>
+
+      <div class="dialogue">
+        <div class="speaker" id="speaker">서아</div>
+        <p class="line" id="line" aria-live="polite"></p>
+      </div>
+
+      <div class="choices" id="choices"></div>
+
+      <div class="panel-actions">
+        <span class="key-hint" id="keyHint">클릭 또는 <kbd>Space</kbd></span>
+        <button class="next-btn" id="nextBtn" type="button">계속 <span aria-hidden="true">›</span></button>
+      </div>
+      <div class="panel-foot">당신의 선택이 서아의 마음을 바꿉니다</div>
+    </section>
+  </main>
+
+  <!-- title -->
+  <section class="title-screen" id="titleScreen" aria-label="타이틀">
+    <div class="title-inner">
+      <p class="title-eyebrow">INTERACTIVE ROMANCE · 7 DAYS</p>
+      <h1 class="title-main">
+        여름의 끝에서,<br />
+        <em>너에게</em>
+      </h1>
+      <p class="title-sub">골목 끝 꽃집 <strong>‘여름의 문’</strong>에서 시작된<br />일주일간의 작고 큰 마음들.</p>
+
+      <label class="name-field">
+        <span>당신의 이름</span>
+        <input id="nameInput" type="text" maxlength="8" placeholder="민준" autocomplete="off" spellcheck="false" />
+      </label>
+
+      <div class="title-actions">
+        <button class="primary-btn" id="startBtn" type="button">첫날 시작하기</button>
+        <button class="ghost-btn" id="continueBtn" type="button" hidden>이어서 하기</button>
+      </div>
+
+      <p class="title-note">약 10분 · 선택에 따라 5가지 결말</p>
+      <button class="text-btn" id="titleCredits" type="button">만든 이야기 · 안내</button>
+    </div>
+    <div class="title-scrim" aria-hidden="true"></div>
+    <div class="title-flower" aria-hidden="true">
+      <span></span><span></span><span></span><span></span><span></span>
+    </div>
+  </section>
+
+  <!-- day intro -->
+  <div class="veil" id="dayVeil" hidden>
+    <div class="veil-card">
+      <p class="veil-day" id="veilDay">DAY 1</p>
+      <h2 class="veil-title" id="veilTitle">첫 만남</h2>
+      <p class="veil-quote" id="veilQuote"></p>
+      <div class="veil-line"></div>
+      <button class="text-btn" id="veilSkip" type="button">건너뛰기</button>
+    </div>
+  </div>
+
+  <!-- minigame -->
+  <div class="veil veil-mini" id="minigame" hidden>
+    <div class="mini-card">
+      <p class="mini-eyebrow">DAY 6 · 축제 전야</p>
+      <h2 class="mini-title">심장 소리 맞추기</h2>
+      <p class="mini-desc">전구를 거는 서아의 옆에서, 심장이 너무 크게 뛴다.<br />박자가 가운데에 올 때 <b>지금!</b>을 눌러라.</p>
+      <div class="heart-track" id="heartTrack">
+        <div class="heart-track-inner" aria-hidden="true"></div>
+        <div class="sweet-zone" aria-hidden="true"><span>♥</span></div>
+        <div class="marker" id="miniMarker" aria-hidden="true"></div>
+      </div>
+      <div class="mini-score" id="miniScore" aria-live="polite">세 번의 박자 · 0 / 3</div>
+      <div class="mini-hearts" id="miniHearts" aria-hidden="true"><i>♡</i><i>♡</i><i>♡</i></div>
+      <button class="primary-btn mini-btn" id="miniTap" type="button">지금!</button>
+      <p class="mini-hint">스페이스 키로도 가능해요</p>
+    </div>
+  </div>
+
+  <!-- menu -->
+  <div class="veil veil-menu" id="menu" hidden>
+    <div class="menu-card" role="dialog" aria-modal="true" aria-labelledby="menuTitle">
+      <div class="menu-head">
+        <h2 id="menuTitle">잠시 쉬어갈까요?</h2>
+        <button class="icon-btn" id="menuClose" type="button" aria-label="메뉴 닫기">✕</button>
+      </div>
+      <div class="menu-rows">
+        <button class="menu-row" id="menuSound" type="button"><span>배경 음악</span><b id="menuSoundState">꺼짐</b></button>
+        <button class="menu-row" id="menuRestart" type="button"><span>처음부터 다시</span><b>›</b></button>
+        <button class="menu-row" id="menuTitleBtn" type="button"><span>타이틀로</span><b>›</b></button>
+      </div>
+      <p class="menu-note">진행 상황은 이 브라우저에 자동으로 저장됩니다.</p>
+      <div class="menu-credit">꽃집 ‘여름의 문’ · 7 days romance<br /><span>일러스트 · 이야기 · 코드 모두 이 페이지 안에서</span></div>
+    </div>
+  </div>
+
+  <!-- ending -->
+  <section class="ending" id="ending" hidden>
+    <div class="ending-inner">
+      <p class="ending-eyebrow" id="endingEyebrow">TRUE ENDING</p>
+      <h2 class="ending-title" id="endingTitle">여름의 끝에서</h2>
+      <div class="ending-heart" aria-hidden="true">♥</div>
+      <div class="ending-body" id="endingBody"></div>
+      <div class="ending-memories" id="endingMemories"></div>
+      <div class="ending-stats">
+        <div><span>최종 호감도</span><b id="endingAffection">0</b></div>
+        <div><span>함께한 기억</span><b id="endingMemoryCount">0</b></div>
+      </div>
+      <div class="ending-actions">
+        <button class="primary-btn" id="endingRestart" type="button">다시, 여름으로</button>
+        <button class="ghost-btn" id="endingTitleBtn" type="button">타이틀</button>
+      </div>
+      <p class="ending-quote" id="endingQuote"></p>
+    </div>
+  </section>
+
+  <!-- restart confirm -->
+  <div class="veil veil-confirm" id="confirm" hidden>
+    <div class="confirm-card" role="alertdialog" aria-modal="true" aria-labelledby="confirmText">
+      <p id="confirmText">처음부터 다시 시작할까요?<br /><small>지금까지의 선택이 사라집니다.</small></p>
+      <div class="confirm-actions">
+        <button class="ghost-btn" id="confirmNo" type="button">취소</button>
+        <button class="primary-btn" id="confirmYes" type="button">다시 시작</button>
+      </div>
+    </div>
+  </div>
+
+  <div class="toasts" id="toasts" aria-live="polite"></div>
+
+  <script src="js/story.js" defer></script>
+  <script src="js/game.js" defer></script>
+</body>
+</html>
