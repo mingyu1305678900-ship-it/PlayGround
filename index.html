@@ -1,0 +1,201 @@
+<!doctype html>
+<html lang="ko">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover" />
+  <meta name="theme-color" content="#0b0918" />
+  <meta name="description" content="별이 내리는 밤, 너와 — 별을 그리는 그녀와 다섯 번의 금요일을 담은 로맨스 비주얼 노블." />
+  <title>별이 내리는 밤, 너와</title>
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 64 64'%3E%3Cdefs%3E%3ClinearGradient id='g' x1='0' y1='0' x2='1' y2='1'%3E%3Cstop stop-color='%23ffd9a0'/%3E%3Cstop offset='1' stop-color='%23ff8fae'/%3E%3C/linearGradient%3E%3C/defs%3E%3Crect width='64' height='64' rx='16' fill='%230d0a1c'/%3E%3Cpath d='M32 12l5.3 14.7L52 32l-14.7 5.3L32 52l-5.3-14.7L12 32l14.7-5.3z' fill='url(%23g)'/%3E%3C/svg%3E" />
+  <link rel="stylesheet" href="styles.css" />
+</head>
+<body>
+  <main id="game" data-scene="title" data-expression="smile">
+    <div class="ambient-layer" id="ambientLayer" aria-hidden="true">
+      <div class="bg-wrap" id="bgWrap"></div>
+      <div class="stage-glow" aria-hidden="true"></div>
+      <div class="wash" aria-hidden="true"></div>
+    </div>
+
+    <canvas id="particles" aria-hidden="true"></canvas>
+    <div class="vignette" aria-hidden="true"></div>
+    <div class="grain" aria-hidden="true"></div>
+
+    <section class="character-stage" id="characterStage" aria-hidden="true">
+      <div class="character-glow"></div>
+      <div class="portrait" id="portrait"></div>
+      <div class="portrait-shadow"></div>
+    </section>
+
+    <header class="hud" id="hud">
+      <div class="hud-left">
+        <div class="chapter-pill" id="chapterPill"><span class="chapter-dot"></span><span id="chapterLabel">Chapter 1</span></div>
+        <div class="affection-meter" id="affectionMeter" title="서아의 마음">
+          <span class="heart-icon" aria-hidden="true">
+            <svg viewBox="0 0 24 24"><path d="M12 21s-8.2-4.9-10.4-10.1C.2 6.9 2.7 3 7 3c2.2 0 3.9 1.2 5 2.8C13.1 4.2 14.8 3 17 3c4.3 0 6.8 3.9 5.4 7.9C20.2 16.1 12 21 12 21z"/></svg>
+          </span>
+          <span class="meter-track"><span class="meter-fill" id="affectionFill"></span></span>
+          <span class="meter-value" id="affectionValue">0</span>
+        </div>
+      </div>
+      <div class="hud-actions">
+        <button class="icon-btn" id="soundBtn" type="button" aria-label="소리 끄기" title="소리 (S)">
+          <svg class="ico-on" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4zm12.5 3a4.5 4.5 0 0 0-2.5-4v8a4.5 4.5 0 0 0 2.5-4zm-2.5-9v2.1A7 7 0 0 1 19 12a7 7 0 0 1-5 6.9V21a9 9 0 0 0 0-18z"/></svg>
+          <svg class="ico-off" viewBox="0 0 24 24" aria-hidden="true"><path d="M4 9v6h4l5 4V5L8 9H4zm17.3-.3-1.4-1.4L17 10.2l-2.9-2.9-1.4 1.4 2.9 2.9-2.9 2.9 1.4 1.4 2.9-2.9 2.9 2.9 1.4-1.4-2.9-2.9 2.9-2.9z"/></svg>
+        </button>
+        <button class="icon-btn" id="galleryBtn" type="button" aria-label="추억 보관함" title="추억 (G)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M12 2.6l2.9 5.9 6.5.9-4.7 4.6 1.1 6.5-5.8-3-5.8 3 1.1-6.5L2.6 9.4l6.5-.9L12 2.6z"/></svg>
+        </button>
+        <button class="icon-btn" id="menuBtn" type="button" aria-label="메뉴" title="메뉴 (Esc)">
+          <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M4 6h16v2H4V6zm0 5h16v2H4v-2zm0 5h16v2H4v-2z"/></svg>
+        </button>
+      </div>
+    </header>
+
+    <section class="dialogue-area" id="dialogueArea" aria-live="polite">
+      <div class="dialogue-card" id="dialogueCard">
+        <div class="speaker-row">
+          <div class="speaker-name" id="speakerName">서아</div>
+          <div class="speaker-line"></div>
+          <div class="scene-time" id="sceneTime"></div>
+        </div>
+        <p class="dialogue-text" id="dialogueText"></p>
+        <div class="dialogue-footer">
+          <button class="auto-btn" id="autoBtn" type="button" aria-pressed="false" title="자동 진행 (A)">
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7L8 5z"/></svg><span>자동</span>
+          </button>
+          <button class="advance-btn" id="advanceBtn" type="button" aria-label="다음">
+            <span class="advance-label">다음</span>
+            <svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8.6 5.6 15 12l-6.4 6.4 1.4 1.4L17.8 12 9.9 4.1 8.6 5.6z"/></svg>
+          </button>
+        </div>
+      </div>
+      <div class="choice-list" id="choiceList" role="group" aria-label="선택지"></div>
+    </section>
+
+    <div class="toast-stack" id="toastStack" aria-live="polite"></div>
+
+    <section class="title-screen" id="titleScreen">
+      <div class="title-copy">
+        <p class="eyebrow"><span></span> A STORY OF FIVE FRIDAYS <span></span></p>
+        <h1 class="game-title">
+          <span class="title-line title-line-1">별이 내리는 밤,</span>
+          <span class="title-line title-line-2">너와</span>
+        </h1>
+        <p class="title-sub">비 오는 금요일, 작은 카페에서 시작된 다섯 번의 밤.<br />별을 그리는 그녀와, 별을 잃어버린 나의 이야기.</p>
+        <div class="name-field">
+          <label for="playerName">당신의 이름</label>
+          <input id="playerName" maxlength="10" value="도윤" autocomplete="off" spellcheck="false" />
+        </div>
+        <div class="title-actions">
+          <button class="play-btn" id="playBtn" type="button" aria-label="Play game">
+            <span class="play-icon"><svg viewBox="0 0 24 24" aria-hidden="true"><path d="M8 5v14l11-7L8 5z"/></svg></span>
+            <span class="play-text"><strong>Play</strong><small>게임 시작</small></span>
+          </button>
+          <button class="continue-btn" id="continueBtn" type="button" hidden>이어서 하기</button>
+        </div>
+        <p class="title-foot">마우스 클릭 · Space · Enter 로 진행 &nbsp;|&nbsp; 선택지에서 당신의 마음을 골라주세요</p>
+      </div>
+      <div class="title-credit">
+        <span>별이 내리는 밤, 너와</span>
+        <span class="dot">·</span>
+        <span>모바일 &amp; 데스크톱</span>
+        <span class="dot">·</span>
+        <span id="endingCount">엔딩 0 / 4</span>
+      </div>
+      <div class="title-stars" aria-hidden="true">
+        <i></i><i></i><i></i><i></i><i></i><i></i><i></i>
+      </div>
+    </section>
+
+    <section class="ending-screen" id="endingScreen" hidden>
+      <div class="ending-inner">
+        <p class="ending-kicker" id="endingKicker">TRUE ENDING</p>
+        <h2 class="ending-title" id="endingTitle"></h2>
+        <p class="ending-sub" id="endingSub"></p>
+        <div class="ending-stats">
+          <div><span>호감도</span><strong id="endAffection">0</strong></div>
+          <div><span>신뢰</span><strong id="endTrust">0</strong></div>
+          <div><span>추억</span><strong id="endMemories">0</strong></div>
+        </div>
+        <p class="ending-note" id="endingNote"></p>
+        <div class="ending-actions">
+          <button class="play-btn small" id="replayBtn" type="button"><span class="play-text"><strong>다시 만나기</strong><small>Replay</small></span></button>
+          <button class="ghost-btn" id="endingTitleBtn" type="button">타이틀로</button>
+        </div>
+        <p class="ending-collection" id="endingCollection"></p>
+      </div>
+    </section>
+
+    <div class="modal-backdrop" id="modalBackdrop" hidden></div>
+
+    <section class="panel menu-panel" id="menuPanel" hidden aria-label="메뉴">
+      <div class="panel-head">
+        <h3>잠시, 별을 세는 시간</h3>
+        <button class="close-btn" data-close type="button" aria-label="닫기">×</button>
+      </div>
+      <div class="panel-body">
+        <div class="menu-grid">
+          <button class="menu-item" id="saveBtn" type="button"><span class="mi-icon">✧</span><span><strong>저장하기</strong><small>지금 이 밤을 기억해두기</small></span></button>
+          <button class="menu-item" id="loadBtn" type="button"><span class="mi-icon">☾</span><span><strong>불러오기</strong><small>저장된 밤으로 돌아가기</small></span></button>
+          <button class="menu-item" id="historyBtn" type="button"><span class="mi-icon">≡</span><span><strong>대화 기록</strong><small>지나온 말들을 다시 보기</small></span></button>
+          <button class="menu-item" id="muteMenuBtn" type="button"><span class="mi-icon">♪</span><span><strong>소리</strong><small id="muteMenuLabel">켜짐</small></span></button>
+          <button class="menu-item" id="galleryMenuBtn" type="button"><span class="mi-icon">★</span><span><strong>추억 보관함</strong><small>함께 만든 장면들</small></span></button>
+          <button class="menu-item" id="settingsMenuBtn" type="button"><span class="mi-icon">⚙</span><span><strong>설정</strong><small>글자 속도와 화면 효과</small></span></button>
+          <button class="menu-item danger" id="restartBtn" type="button"><span class="mi-icon">↺</span><span><strong>처음부터</strong><small>첫 번째 밤으로 돌아가기</small></span></button>
+        </div>
+        <div class="panel-tip">Tip. 선택지는 정답이 없어요. 다만, 서아는 당신의 진심을 기억합니다.</div>
+      </div>
+    </section>
+
+    <section class="panel history-panel" id="historyPanel" hidden aria-label="대화 기록">
+      <div class="panel-head">
+        <h3>지나온 말들</h3>
+        <button class="close-btn" data-close type="button" aria-label="닫기">×</button>
+      </div>
+      <div class="panel-body history-body" id="historyBody"></div>
+    </section>
+
+    <section class="panel gallery-panel" id="galleryPanel" hidden aria-label="추억 보관함">
+      <div class="panel-head">
+        <h3>추억 보관함</h3>
+        <button class="close-btn" data-close type="button" aria-label="닫기">×</button>
+      </div>
+      <div class="panel-body">
+        <p class="gallery-intro" id="galleryIntro">아직 아무것도 담기지 않았어요. 첫 번째 밤을 시작해볼까요?</p>
+        <div class="gallery-grid" id="galleryGrid"></div>
+      </div>
+    </section>
+
+    <section class="panel settings-panel" id="settingsPanel" hidden aria-label="설정">
+      <div class="panel-head">
+        <h3>설정</h3>
+        <button class="close-btn" data-close type="button" aria-label="닫기">×</button>
+      </div>
+      <div class="panel-body">
+        <label class="setting-row"><span>글자 속도</span><input type="range" id="speedRange" min="0" max="2" step="1" value="1" /><span id="speedLabel">보통</span></label>
+        <label class="setting-row"><span>소리</span><input type="checkbox" id="soundToggle" checked /><span id="soundLabel">켜짐</span></label>
+        <label class="setting-row"><span>화면 흔들림</span><input type="checkbox" id="shakeToggle" checked /><span id="shakeLabel">켜짐</span></label>
+      </div>
+    </section>
+
+    <div class="confirm-backdrop" id="confirmBackdrop" hidden>
+      <div class="confirm-box" role="dialog" aria-modal="true" aria-labelledby="confirmTitle">
+        <h4 id="confirmTitle">처음부터 시작할까요?</h4>
+        <p id="confirmMessage">지금까지의 기록은 사라져요. 저장하지 않은 밤은 되돌릴 수 없어요.</p>
+        <div class="confirm-actions">
+          <button class="ghost-btn" id="confirmNo" type="button">취소</button>
+          <button class="solid-btn" id="confirmYes" type="button">확인</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="skip-indicator" id="skipIndicator" hidden>SKIP</div>
+  </main>
+
+  <script src="js/art.js"></script>
+  <script src="js/audio.js"></script>
+  <script src="js/story.js"></script>
+  <script src="js/game.js"></script>
+</body>
+</html>
