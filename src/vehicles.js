@@ -193,6 +193,7 @@ export class Vehicle {
     this.fireTimer = 0;
     this.flashTimer = 0;
     this.collisionCooldown = 0;
+    this.stuckTimer = 0;
     this.entered = false;
   }
 
@@ -237,7 +238,9 @@ export class Vehicle {
       if (input.back) this.throttle = forward > 0.6 ? 0 : -0.65;
       if (input.back && forward > 0.6) this.brake = 1;
       else this.brake = input.brake ? 1 : 0;
-      this.steer = input.left ? -1 : input.right ? 1 : 0;
+      // The chase camera sits behind the car, so world +X is screen-left.
+      // Negate the intent so A/left actually turns left on screen.
+      this.steer = -input.carSteer;
       if (input.brake && Math.abs(this.speed) > 6) this.steer *= 1.5;
     } else if (this.ai) {
       this._updateAI(dt, game);
@@ -332,35 +335,43 @@ export class Vehicle {
 
   _updateAI(dt, game) {
     const ai = this.ai;
-    const target = ai.target;
-    if (!target) return;
-    const tp = target.vehicle ? target.vehicle.pos : target.pos;
-    if (!tp) return;
-    let tx = tp.x;
-    let tz = tp.z;
+    if (!ai) return;
 
+    let tx;
+    let tz;
+    let dist;
     if (ai.type === 'traffic') {
-      if (ai.waypoint) {
+      // Traffic uses waypoints and has no chase target. The old code bailed
+      // out here because ai.target was undefined, which left every traffic
+      // car coasting straight until it stopped.
+      if (!ai.waypoint) return;
+      tx = ai.waypoint.x;
+      tz = ai.waypoint.z;
+      dist = Math.hypot(tx - this.pos.x, tz - this.pos.z);
+      if (dist < 5.5) {
+        this._nextTrafficWaypoint(game.world);
         tx = ai.waypoint.x;
         tz = ai.waypoint.z;
-        const d = Math.hypot(tx - this.pos.x, tz - this.pos.z);
-        if (d < 5.5) {
-          this._nextTrafficWaypoint(game.world);
-          tx = ai.waypoint.x;
-          tz = ai.waypoint.z;
-        }
+        dist = Math.hypot(tx - this.pos.x, tz - this.pos.z);
       }
+    } else {
+      const target = ai.target;
+      if (!target) return;
+      const tp = target.vehicle ? target.vehicle.pos : target.pos;
+      if (!tp) return;
+      tx = tp.x;
+      tz = tp.z;
+      dist = Math.hypot(tx - this.pos.x, tz - this.pos.z);
     }
 
     const dx = tx - this.pos.x;
     const dz = tz - this.pos.z;
-    const dist = Math.hypot(dx, dz);
     const desired = Math.atan2(dx, dz);
     let diff = ((desired - this.heading + Math.PI) % (Math.PI * 2)) - Math.PI;
     if (diff < -Math.PI) diff += Math.PI * 2;
     this.steer = clamp(diff * 2.4, -1, 1);
 
-    let desiredSpeed = this.stats.maxSpeed * (ai.type === 'chase' ? 0.95 : 0.46);
+    let desiredSpeed = this.stats.maxSpeed * (ai.type === 'chase' ? 0.95 : 0.52);
     if (Math.abs(diff) > 0.8) desiredSpeed *= 0.4;
     if (dist < 16 && ai.type === 'chase') desiredSpeed = Math.max(0, (dist - 6) * 1.6);
 
@@ -369,12 +380,15 @@ export class Vehicle {
     const fwdX = Math.sin(this.heading);
     const fwdZ = Math.cos(this.heading);
     for (const other of game.vehicles.vehicles) {
-      if (other === this) continue;
+      if (other === this || other.dead) continue;
+      // Parked cars sit at the curb; don't let them freeze a whole lane.
+      if (!other.ai && !other.isPlayer) continue;
       const ox = other.pos.x - this.pos.x;
       const oz = other.pos.z - this.pos.z;
       const ahead = ox * fwdX + oz * fwdZ;
       const lateral = Math.abs(ox * fwdZ - oz * fwdX);
-      if (ahead > 1 && ahead < 10 && lateral < 2.3) {
+      const lateralLimit = other.isPlayer ? 2.2 : 1.7;
+      if (ahead > 1.5 && ahead < 11 && lateral < lateralLimit) {
         blocked = true;
         break;
       }
@@ -387,6 +401,24 @@ export class Vehicle {
       const lateral = Math.abs(ox * fwdZ - oz * fwdX);
       if (ahead > 0 && ahead < 8 && lateral < 2.2) blocked = true;
     }
+
+    // Simple anti-gridlock: if a traffic car has been pinned for a while,
+    // let it creep through for a moment and pick a fresh waypoint.
+    if (ai.type === 'traffic') {
+      if (ai.ignoreBlockers > 0) {
+        ai.ignoreBlockers -= dt;
+        blocked = false;
+      }
+      if (blocked) this.stuckTimer += dt;
+      else this.stuckTimer = Math.max(0, this.stuckTimer - dt * 1.5);
+      if (this.stuckTimer > 3.5) {
+        this.stuckTimer = 0;
+        ai.ignoreBlockers = 1.6;
+        this._nextTrafficWaypoint(game.world);
+        blocked = false;
+      }
+    }
+
     if (blocked) desiredSpeed = 0;
 
     if (this.speed < desiredSpeed - 0.4) this.throttle = 0.8;
@@ -397,7 +429,8 @@ export class Vehicle {
   }
 
   initTraffic(world) {
-    this.ai = { type: 'traffic', waypoint: null };
+    this.ai = { type: 'traffic', waypoint: null, ignoreBlockers: 0 };
+    this.stuckTimer = 0;
     this.nodeI = clamp(Math.round(this.pos.x / 78), -4, 4);
     this.nodeJ = clamp(Math.round(this.pos.z / 78), -4, 4);
     // determine closest direction from heading
@@ -451,7 +484,8 @@ export class VehicleManager {
     this.scene = scene;
     this.world = world;
     this.vehicles = [];
-    this.trafficCount = 12;
+    this.trafficCount = 20;
+    this.trafficTimer = 0;
     this.headlight = new THREE.SpotLight(0xfff0c8, 0, 62, 0.55, 0.5, 1.2);
     this.headlight.castShadow = false;
     this.headlight.position.set(0, 1, 0);
@@ -494,12 +528,15 @@ export class VehicleManager {
   }
 
   _spawnTraffic() {
+    const center = this.world.spawn || { x: 0, z: 0 };
     for (let i = 0; i < this.trafficCount; i++) {
-      const spot = this._roadSpawn(20, 260, { x: 0, z: 0 });
+      // Put a handful of cars in the player's first view so the city feels alive.
+      const close = i < 7;
+      const spot = this._roadSpawn(close ? 16 : 55, close ? 95 : 270, center);
       const v = this.add({
         x: spot.x, z: spot.z, heading: spot.heading,
         type: pick(['sedan', 'sedan', 'suv', 'sports', 'van', 'taxi']),
-        speed: rand(3, 9),
+        speed: rand(4, 10),
       });
       v.initTraffic(this.world);
     }
@@ -554,11 +591,11 @@ export class VehicleManager {
   }
 
   spawnTrafficNear(pos) {
-    const spot = this._roadSpawn(80, 240, pos);
+    const spot = this._roadSpawn(55, 200, pos);
     const v = this.add({
       x: spot.x, z: spot.z, heading: spot.heading,
       type: pick(['sedan', 'sedan', 'suv', 'sports', 'van', 'taxi']),
-      speed: rand(4, 8),
+      speed: rand(4, 9),
     });
     v.initTraffic(this.world);
     return v;
@@ -570,16 +607,28 @@ export class VehicleManager {
       v.updatePhysics(dt, game);
       if (!v.isPlayer && v.ai?.type === 'traffic') {
         const d = Math.hypot(v.pos.x - player.pos.x, v.pos.z - player.pos.z);
-        if (d > 290) {
-          // recycle far traffic
-          const spot = this._roadSpawn(100, 240, player.pos);
+        if (d > 235) {
+          // recycle far traffic back into the player's neighborhood
+          const spot = this._roadSpawn(70, 190, player.pos);
           v.group.position.set(spot.x, 0, spot.z);
           v.heading = spot.heading;
           v.group.rotation.y = spot.heading;
-          v.speed = rand(3, 8);
+          v.speed = rand(4, 9);
+          v.stuckTimer = 0;
           v.initTraffic(this.world);
         }
       }
+    }
+
+    // Keep a steady stream of moving cars even after thefts or explosions.
+    this.trafficTimer -= dt;
+    if (this.trafficTimer <= 0) {
+      this.trafficTimer = 2.5;
+      let activeTraffic = 0;
+      for (const v of this.vehicles) {
+        if (!v.dead && !v.isPlayer && v.ai?.type === 'traffic') activeTraffic++;
+      }
+      if (activeTraffic < this.trafficCount) this.spawnTrafficNear(player.pos);
     }
 
     // car vs car

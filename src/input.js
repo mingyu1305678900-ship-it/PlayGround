@@ -19,6 +19,13 @@ export class Input {
     this.touchFire = false;
     this.touchSprint = false;
     this.touchBrake = false;
+    this.touchLeft = false;
+    this.touchRight = false;
+    this.steerInvert = false;
+    try {
+      this.steerInvert = localStorage.getItem('streetheat.steerInvert') === '1';
+    } catch (e) { /* storage can be unavailable */ }
+    this._drivingUI = null;
     this.stickPointer = null;
     this.stickCenter = { x: 0, y: 0 };
     this.lookPointer = null;
@@ -33,8 +40,53 @@ export class Input {
   get back() { return this.moveY < -0.15; }
   get left() { return this.moveX < -0.15; }
   get right() { return this.moveX > 0.15; }
+  // Driving intent: -1 = left, +1 = right. Dedicated steering buttons
+  // take priority over the joystick while a car is being driven.
+  get carSteer() {
+    let steer = this.touchSteer;
+    if (steer === 0) steer = this.moveX;
+    steer = clamp(steer, -1, 1);
+    return this.steerInvert ? -steer : steer;
+  }
+  get touchSteer() {
+    return (this.touchRight ? 1 : 0) - (this.touchLeft ? 1 : 0);
+  }
   get firing() { return this.mouseDown || this.touchFire; }
   get aiming() { return this.aim || (this.touchAimToggle && !this.game.player?.inVehicle); }
+
+  toggleSteerInvert(game) {
+    this.steerInvert = !this.steerInvert;
+    try {
+      localStorage.setItem('streetheat.steerInvert', this.steerInvert ? '1' : '0');
+    } catch (e) { /* storage can be unavailable */ }
+    const swap = document.getElementById('btn-steer-swap');
+    if (swap) {
+      swap.classList.toggle('on', this.steerInvert);
+      swap.setAttribute('aria-pressed', this.steerInvert ? 'true' : 'false');
+    }
+    if (game?.hud) {
+      game.hud.subtitle(`좌우 조작 반전 ${this.steerInvert ? 'ON' : 'OFF'}`, 1.6);
+    }
+    if (game?.audio) game.audio.click();
+  }
+
+  setDrivingUI(on) {
+    if (!this.touch) return;
+    if (this._drivingUI === on) return;
+    this._drivingUI = on;
+    document.body.classList.toggle('driving', on);
+    const controls = document.getElementById('car-controls');
+    if (controls) controls.classList.toggle('hidden', !on);
+    const swap = document.getElementById('btn-steer-swap');
+    if (swap) {
+      swap.classList.toggle('on', this.steerInvert);
+      swap.setAttribute('aria-pressed', this.steerInvert ? 'true' : 'false');
+    }
+    if (!on) {
+      this.touchLeft = false;
+      this.touchRight = false;
+    }
+  }
 
   _bindKeyboard() {
     window.addEventListener('keydown', (e) => {
@@ -67,6 +119,9 @@ export class Input {
         case 'KeyH':
           if (game.player.inVehicle) game.audio.horn();
           break;
+        case 'KeyV':
+          if (game.player.inVehicle) this.toggleSteerInvert(game);
+          break;
         case 'KeyB':
           if (game.player.inVehicle && game.radio) game.radio.next();
           break;
@@ -86,6 +141,9 @@ export class Input {
       this.keys.clear();
       this.mouseDown = false;
       this.aim = false;
+      this.touchLeft = false;
+      this.touchRight = false;
+      this.touchFire = false;
     });
   }
 
@@ -176,6 +234,8 @@ export class Input {
     hold('btn-sprint', () => { this.touchSprint = true; this.sprint = true; }, () => { this.touchSprint = false; this.sprint = false; });
     hold('btn-brake', () => { this.touchBrake = true; }, () => { this.touchBrake = false; });
     hold('btn-aim', () => { this.touchAimToggle = !this.touchAimToggle; }, () => {});
+    hold('btn-steer-left', () => { this.touchLeft = true; }, () => { this.touchLeft = false; });
+    hold('btn-steer-right', () => { this.touchRight = true; }, () => { this.touchRight = false; });
 
     const tap = (id, fn) => {
       const el = document.getElementById(id);
@@ -188,6 +248,7 @@ export class Input {
       else this.game.player.tryEnterVehicle(this.game, true);
     });
     tap('btn-reload', () => this.game.player.reload(this.game));
+    tap('btn-steer-swap', () => this.toggleSteerInvert(this.game));
     tap('weapon-hud', () => {
       const player = this.game.player;
       if (!player || player.inVehicle) return;

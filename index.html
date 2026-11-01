@@ -82,6 +82,12 @@
             <button id="btn-brake" class="tbtn small">BRAKE</button>
             <button id="btn-reload" class="tbtn tiny">R</button>
           </div>
+          <div id="car-controls" class="car-controls hidden">
+            <span class="car-controls-label">STEER</span>
+            <button id="btn-steer-left" class="tbtn steer" aria-label="좌회전">◀</button>
+            <button id="btn-steer-right" class="tbtn steer" aria-label="우회전">▶</button>
+            <button id="btn-steer-swap" class="tbtn swap" aria-label="좌우 조작 반전" aria-pressed="false">⇄</button>
+          </div>
         </div>
       </div>
 
@@ -108,6 +114,7 @@
             <div><kbd>1 2 3</kbd><span>무기 변경</span></div>
             <div><kbd>H</kbd><span>경적</span></div>
             <div><kbd>B</kbd><span>라디오</span></div>
+            <div><kbd>V</kbd><span>차량 좌우 반전</span></div>
           </div>
           <div class="loading-wrap">
             <div class="loading-label"><span id="load-status">INITIALIZING</span><span id="load-pct">0%</span></div>
@@ -143,7 +150,7 @@
         </div>
       </div>
 
-      <div id="touch-hint" class="touch-hint hidden">왼쪽 스틱으로 이동 · 오른쪽 화면 드래그로 시점</div>
+      <div id="touch-hint" class="touch-hint hidden">왼쪽 스틱으로 이동 · 차량 탑승 후 ◀ ▶ 버튼으로 조향</div>
     </div>
     <script type="module" src="/src/main.js"></script>
   </body>
